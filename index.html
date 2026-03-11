@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>כמה חרא לך במלחמה?</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --olive:   #5a6e3a;
+      --olive-d: #3d4e27;
+      --khaki:   #c8b87a;
+      --sand:    #f5ecd7;
+      --red:     #c0392b;
+      --dark:    #1a1a1a;
+      --card:    #ffffff;
+      --radius:  14px;
+    }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--sand);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-image:
+        radial-gradient(ellipse at top right, rgba(90,110,58,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at bottom left, rgba(192,57,43,0.1) 0%, transparent 60%);
+    }
+
+    /* ── wrapper ── */
+    #app {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* ── SCREEN base ── */
+    .screen {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+
+    /* ── INTRO ── */
+    #screen-intro .emoji-banner {
+      font-size: 3.2rem;
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+    #screen-intro h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      text-align: center;
+      color: var(--olive-d);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    #screen-intro .subtitle {
+      text-align: center;
+      color: #555;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    #screen-intro .meta {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .meta-item .ico { font-size: 1.4rem; }
+    .meta-item strong { color: var(--dark); font-size: 0.95rem; }
+
+    /* ── QUESTION ── */
+    #screen-question .progress-bar-wrap {
+      background: #e8e0d0;
+      border-radius: 99px;
+      height: 8px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--olive), var(--khaki));
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    .progress-label {
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    #q-number {
+      display: inline-block;
+      background: var(--olive-d);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 99px;
+      padding: 3px 12px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    #q-text {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      line-height: 1.4;
+      color: var(--olive-d);
+    }
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .answer-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--sand);
+      border: 2px solid #ddd5bf;
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      font-family: 'Heebo', sans-serif;
+      font-size: 1rem;
+      color: var(--dark);
+      cursor: pointer;
+      text-align: right;
+      transition: all 0.18s ease;
+      width: 100%;
+    }
+    .answer-btn:hover {
+      border-color: var(--olive);
+      background: #eef2e6;
+      transform: translateX(-3px);
+    }
+    .answer-btn.selected {
+      border-color: var(--olive);
+      background: #e0e9d0;
+    }
+    .answer-btn .letter {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--olive);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .answer-btn.selected .letter { background: var(--olive-d); }
+
+    /* ── NEXT button ── */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      margin-top: 24px;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--olive-d), var(--olive));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Heebo', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-primary:not(:disabled):hover { opacity: 0.9; transform: scale(1.01); }
+
+    /* ── RESULT ── */
+    #screen-result .result-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .result-emoji {
+      font-size: 3.5rem;
+      margin-bottom: 8px;
+    }
+    .result-title {
+      font-size: 1.9rem;
+      font-weight: 900;
+      color: var(--olive-d);
+      margin-bottom: 6px;
+    }
+    .score-badge {
+      display: inline-block;
+      background: var(--khaki);
+      color: var(--olive-d);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 99px;
+      padding: 4px 16px;
+      margin-bottom: 20px;
+    }
+    .result-bar-wrap {
+      background: #e8e0d0;
+      border-radius: 99px;
+      height: 14px;
+      margin-bottom: 24px;
+      overflow: hidden;
+      position: relative;
+    }
+    #result-bar {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .result-text {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: #333;
+      background: #f9f5ed;
+      border-right: 4px solid var(--olive);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 18px 20px;
+      margin-bottom: 28px;
+    }
+    .btn-restart {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      color: var(--olive-d);
+      border: 2px solid var(--olive);
+      border-radius: var(--radius);
+      font-family: 'Heebo', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .btn-restart:hover {
+      background: var(--olive-d);
+      color: #fff;
+    }
+
+    /* result color themes */
+    .theme-green  #result-bar { background: linear-gradient(90deg, #5a6e3a, #8aad5a); }
+    .theme-yellow #result-bar { background: linear-gradient(90deg, #c8b87a, #e8c84a); }
+    .theme-orange #result-bar { background: linear-gradient(90deg, #c87a3a, #e8843a); }
+    .theme-red    #result-bar { background: linear-gradient(90deg, #c0392b, #e05a4a); }
+
+    /* ── mobile ── */
+    @media (max-width: 480px) {
+      .card { padding: 24px 18px; }
+      #screen-intro h1 { font-size: 1.6rem; }
+      #q-text { font-size: 1.15rem; }
+      .answer-btn { font-size: 0.92rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- INTRO -->
+  <section id="screen-intro" class="screen active">
+    <div class="card">
+      <div class="emoji-banner">🚨💥🇮🇱</div>
+      <h1>כמה חרא לך במלחמה?</h1>
+      <p class="subtitle">שאלון הומוריסטי על החיים בישראל בזמן מלחמה.<br>10 שאלות, תשובה אחת כנה, ותגלה איפה אתה נמצא על הסקאלה.</p>
+      <div class="meta">
+        <div class="meta-item"><span class="ico">❓</span><strong>10 שאלות</strong><span>מה שלא יגיד</span></div>
+        <div class="meta-item"><span class="ico">⏱️</span><strong>2 דקות</strong><span>בין אזעקות</span></div>
+        <div class="meta-item"><span class="ico">🏆</span><strong>4 דירוגים</strong><span>מפנאן לאשכרה</span></div>
+      </div>
+      <button class="btn-primary" onclick="startQuiz()">בואו נתחיל 🚀</button>
+    </div>
+  </section>
+
+  <!-- QUESTION -->
+  <section id="screen-question" class="screen">
+    <div class="card">
+      <div class="progress-bar-wrap"><div id="progress-bar"></div></div>
+      <div class="progress-label" id="progress-label"></div>
+      <div id="q-number"></div>
+      <div id="q-text"></div>
+      <div class="answers" id="answers"></div>
+      <button class="btn-primary" id="btn-next" disabled onclick="nextQuestion()">הבא ←</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="screen-result" class="screen" id="screen-result">
+    <div class="card" id="result-card">
+      <div class="result-header">
+        <div class="result-emoji" id="result-emoji"></div>
+        <div class="result-title" id="result-title"></div>
+        <div class="score-badge" id="score-badge"></div>
+      </div>
+      <div class="result-bar-wrap"><div id="result-bar"></div></div>
+      <div class="result-text" id="result-text"></div>
+      <button class="btn-restart" onclick="restartQuiz()">🔄 נסה שוב</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "מה אתה עושה באזעקה?",
+    answers: ["הולך לממ״ד בדירה","יורד למקלט בבניין","רץ למקלט ציבורי","מחזיק אצבעות"]
+  },
+  {
+    q: "עם מי אתה גר?",
+    answers: ["לבד","שותפים","הורים","בן / בת זוג"]
+  },
+  {
+    q: "כמה ילדים?",
+    answers: ["אפס","1","2","3 ומעלה"]
+  },
+  {
+    q: "איפה אתה גר?",
+    answers: ["תל אביב והסביבה / ירושלים והסביבה","הצפון","נתניה עד חדרה","אשדוד ודרומה"]
+  },
+  {
+    q: "כמה אזעקות יש לך בלילה ממוצע?",
+    answers: ["אפס","1","2","3 ומעלה"]
+  },
+  {
+    q: "מה קורה בוואטסאפ שלך?",
+    answers: ["רגיל","יש התעוררות","חפירות בקבוצות","הוא הפך לחמ\"ל"]
+  },
+  {
+    q: "איך עם העבודה?",
+    answers: ["נוסע רגיל","עובד מהבית","חל״ת","אני בין עבודות"]
+  },
+  {
+    q: "מתעדכן בחדשות?",
+    answers: ["בכלל לא","רק פושים","קצת ביום וב-8 בערב","מרפרש את אבו עלי אקספרס מול הטלוויזיה"]
+  },
+  {
+    q: "איך התזונה?",
+    answers: ["אפס טעויות","מעידות פה ושם","אני חוגג","השליח מוולט הזמין אותי לחתונה שלו"]
+  },
+  {
+    q: "איך נראה הערב שלך?",
+    answers: ["סתלבט בסלון","אזעקה אחת לאווירה","הלוך חזור לממ\"ד","תקוע במרחב מוגן"]
+  }
+];
+
+const RESULTS = [
+  {
+    range: [10,16],
+    title: "הכול בשליטה",
+    emoji: "😎",
+    theme: "theme-green",
+    text: "בשבילך המלחמה זה משהו שקורה על המסך. יש לך ממ\"ד וכנראה שהוא בעיקר מחסן או חדר עבודה. אתה ישן טוב בלילה, עובד כרגיל ביום ומתעדכן דרך פושים או גג במהדורה של שמונה. אולי מדי פעם יש איזו אזעקה לאווירה אבל סה\"כ המצב רגיל ואפילו סבבה. חשוב להיות אמפתי למי שיותר קשה לו ולא להתלהב שאצלך הכול פנאן. תיהנה מזה כי המצב נזיל ואי אפשר לדעת איזה אזור יצטרף מחר לחגיגה."
+  },
+  {
+    range: [17,23],
+    title: "מתפקד תחת אש",
+    emoji: "😤",
+    theme: "theme-yellow",
+    text: "מרגישים את המלחמה אבל השגרה מתקתקת. יש אזעקות מדי פעם, כבר ביקרת במרחב המוגן, הצטרפת ל-5 קבוצות חדשות בטלגרם וכל זה בזמן שאתה עובד כרגיל. ריספקט. הילדים מקבלים קצת יותר זמן מסך וחטיפים וגם אתה חוטא באכילה רגשית. הכול בסדר, אני לא שופט. אתה מצליח לג'נגל את הכול למרות שהמצב מתוח וזה לא מובן מאליו. תחזיק מעמד ותכף זה יגמר. אני מקווה."
+  },
+  {
+    range: [24,31],
+    title: "קרוב לקריסה",
+    emoji: "😰",
+    theme: "theme-orange",
+    text: "המצב לא טוב. אזעקות ביום ובלילה, השינה לא רציפה, כולם בבית על הקצה ואתה לא עומד בקצב - לא של העבודה ולא של ההתראות בטלפון. אתם כל הזמן בחדשות ומעבירים רק כדי להתאוורר קצת, שחררת את הרסן בנושא האוכל אבל זאת לא תקופה לספור קלוריות. חוץ מזה אחרי המלחמה תחזור למסלול, עאלק. אתה לא יודע כמה עוד תוכל להחזיק והמחשבה שזה יימשך עוד הרבה זמן עושה לך צמרמורת."
+  },
+  {
+    range: [32,40],
+    title: "מלחמת עולם",
+    emoji: "🤯",
+    theme: "theme-red",
+    text: "אתה חי במצב חירום עם הפסקות קטנות של שגרה. אזעקות ללא הפסקה, לילות לבנים במרחב המוגן, הוואטסאפ שלך הוא חמ\"ל על ספידים ובעבודה כבר הבינו שאתה בעיקר עובד בלשרוד. אתה על סף אובדן צלם אנוש - עייף, עצבני וחי על מה שיש בוולט ובמגירה של החטיפים. מיצית את האירוע ואתה רק רוצה שייגמר. כשהכול ייגמר אתה תצא מהמרחב המוגן ותנשק את הרצפה בסלון."
+  }
+];
+
+const LETTERS = ["א","ב","ג","ד"];
+
+let currentQ = 0;
+let scores = [];
+let selected = null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  currentQ = 0;
+  scores = [];
+  selected = null;
+  renderQuestion();
+  showScreen('screen-question');
+}
+
+function renderQuestion() {
+  const data = QUESTIONS[currentQ];
+  const total = QUESTIONS.length;
+
+  document.getElementById('progress-bar').style.width = (currentQ / total * 100) + '%';
+  document.getElementById('progress-label').textContent = `שאלה ${currentQ + 1} מתוך ${total}`;
+  document.getElementById('q-number').textContent = `שאלה ${currentQ + 1}`;
+  document.getElementById('q-text').textContent = data.q;
+
+  const container = document.getElementById('answers');
+  container.innerHTML = '';
+  selected = null;
+  document.getElementById('btn-next').disabled = true;
+
+  data.answers.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.innerHTML = `<span class="letter">${LETTERS[i]}</span><span>${ans}</span>`;
+    btn.onclick = () => selectAnswer(i + 1, btn);
+    container.appendChild(btn);
+  });
+
+  // Last question: change button text
+  const btnNext = document.getElementById('btn-next');
+  btnNext.textContent = currentQ === QUESTIONS.length - 1 ? 'לתוצאה 🏁' : 'הבא ←';
+}
+
+function selectAnswer(points, btn) {
+  document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selected = points;
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion() {
+  if (selected === null) return;
+  scores.push(selected);
+
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion();
+    // animate progress
+    setTimeout(() => {
+      document.getElementById('progress-bar').style.width =
+        ((currentQ) / QUESTIONS.length * 100) + '%';
+    }, 50);
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  const total = scores.reduce((a, b) => a + b, 0);
+  const result = RESULTS.find(r => total >= r.range[0] && total <= r.range[1]);
+
+  document.getElementById('result-emoji').textContent = result.emoji;
+  document.getElementById('result-title').textContent = result.title;
+  document.getElementById('score-badge').textContent = `ניקוד: ${total} / 40`;
+  document.getElementById('result-text').textContent = result.text;
+
+  // color theme
+  const card = document.getElementById('result-card');
+  card.className = 'card ' + result.theme;
+
+  // animate bar after paint
+  document.getElementById('result-bar').style.width = '0%';
+  showScreen('screen-result');
+  setTimeout(() => {
+    const pct = ((total - 10) / 30 * 100).toFixed(1);
+    document.getElementById('result-bar').style.width = pct + '%';
+  }, 100);
+}
+
+function restartQuiz() {
+  showScreen('screen-intro');
+}
+</script>
+</body>
+</html>
